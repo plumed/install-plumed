@@ -44,38 +44,39 @@ fi
 #cheking out to $version before compiling the dependency json for this $version
 git checkout $version
 
-# This gets all the dependency information in plumed
-{
-    firstline=""
-    echo '{'
-    for mod in src/*/Makefile; do
-        dir=${mod%/*}
-        modname=${dir##*/}
-        typename=$dir/module.type
+if [[ $SETDEPENDENCIES ]]; then
+    # This gets all the dependency information in plumed
+    {
+        firstline=""
+        echo '{'
+        for mod in src/*/Makefile; do
+            dir=${mod%/*}
+            modname=${dir##*/}
+            typename=$dir/module.type
 
-        if [[ ! -f $typename ]]; then
-            modtype="always"
-        else
-            modtype=$(head "$typename")
-        fi
-        dep=$(grep USE "$mod" | sed -e 's/USE=//')
+            if [[ ! -f $typename ]]; then
+                modtype="always"
+            else
+                modtype=$(head "$typename")
+            fi
+            dep=$(grep USE "$mod" | sed -e 's/USE=//')
 
-        IFS=" " read -r -a deparr <<<"$dep"
-        echo -e "${firstline}\"$modname\" : {"
-        echo "\"type\": \"$modtype\","
-        echo -n '"depends" : ['
-        pre=""
-        for d in "${deparr[@]}"; do
-            echo -n "${pre}\"$d\""
-            pre=", "
+            IFS=" " read -r -a deparr <<<"$dep"
+            echo -e "${firstline}\"$modname\" : {"
+            echo "\"type\": \"$modtype\","
+            echo -n '"depends" : ['
+            pre=""
+            for d in "${deparr[@]}"; do
+                echo -n "${pre}\"$d\""
+                pre=", "
+            done
+            echo ']'
+            echo -n '}'
+            firstline=",\n"
         done
-        echo ']'
-        echo -n '}'
-        firstline=",\n"
-    done
-    echo -e '\n}'
-} >"$GITHUB_WORKSPACE/_data/extradeps$version.json"
-
+        echo -e '\n}'
+    } >"$GITHUB_WORKSPACE/_data/extradeps$version.json"
+fi
 hash=$(git rev-parse HEAD)
 
 if [[ -f $HOME/opt/lib/$program_name/$hash ]]; then

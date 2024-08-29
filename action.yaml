@@ -1,0 +1,29 @@
+name: 'Install Plumed'
+description: 'Installs plumed from https://github.com/plumed/plumed2'
+inputs:
+  repository:
+  suffix:
+  version:
+  program_name:
+  who-to-greet:  # id of input
+    description: 'Who to greet'
+    required: true
+    default: 'World'
+outputs:
+  random-number:
+    description: "Random number"
+    value: ${{ steps.random-number-generator.outputs.random-number }}
+runs:
+  using: "composite"
+  steps:
+    - name: Set up environment
+     run: |
+        sudo apt update
+        sudo apt install mpi-default-bin mpi-default-dev
+        sudo apt install libfftw3-dev gsl-bin libgsl0-dev libboost-serialization-dev
+        sudo apt install ccache
+        sudo apt-get update
+    - name: Install plumed
+      run: ./install.sh
+      shell: bash
+      
