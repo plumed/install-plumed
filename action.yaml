@@ -17,8 +17,8 @@ runs:
   using: "composite"
   steps:
     - name: Set up environment
-     shell: bash
-     run: |
+      shell: bash
+      run: |
         sudo apt update
         sudo apt install mpi-default-bin mpi-default-dev
         sudo apt install libfftw3-dev gsl-bin libgsl0-dev libboost-serialization-dev
