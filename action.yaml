@@ -25,6 +25,6 @@ runs:
         sudo apt install ccache
         sudo apt-get update
     - name: Install plumed
-      run: ./install.sh
+      run: install-plumed.sh
       shell: bash
       
