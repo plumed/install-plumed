@@ -1,33 +1,41 @@
 #! /bin/bash
 
+# To me: the enviromental variable I am using as input are in CAPS,
+# if I modify a variable is in lower case
+
 cat <<EOF
 REPO="$REPO"
 VERSION="$VERSION"
-PROGRAM_NAME="$PROGRAM_NAME"
 SUFFIX="$SUFFIX"
 PREFIX="$PREFIX"
 EOF
-
 cd "$(mktemp -dt plumed.XXXXXX)" || {
     echo "Failed to create tempdir"
     exit 1
 }
 
-git clone $REPO
-cd plumed2
+git clone "$REPO" >>/dev/null
+cd plumed2 || {
+    echo "Failed to cd into plumed2"
+    exit 1
+}
 
-if [[ -n "$VERSION" ]]; then
-    echo "installing plumed $VERSION"
+version=$VERSION
+
+if [[ -n "$version" ]]; then
+    echo "installing plumed $version"
 else
-    VERSION=$(git tag --sort=version:refname |
+    version=$(git tag --sort=version:refname |
         grep '^v2\.[0-9][0-9]*\.[0-9][0-9]*' |
         tail -n 1)
-    echo "installing latest stable plumed $VERSION"
+    echo "installing latest stable plumed $version"
 fi
 
 plumed_options="$EXTRA_OPTIONS"
+program_name=plumed
 if [[ -n "$SUFFIX" ]]; then
     plumed_options="$plumed_options --program-suffix=\"$SUFFIX\""
+    program_name=$program_name$SUFFIX
 fi
 
 if [[ -n "$PREFIX" ]]; then
@@ -37,10 +45,11 @@ if [[ -n "$MODULES" ]]; then
     plumed_options="$plumed_options --enable-modules=$MODULES"
 fi
 
-#cheking out to $VERSION before compiling the dependency json for this $VERSION
-git checkout $VERSION
+#cheking out to $version before compiling the dependency json for this $version
+git checkout $version
 
-if [[ $SETDEPENDENCIES ]]; then
+if [[ -n $DEPPATH ]]; then
+    depencies_file="${DEPPATH}/_data/extradeps$version.json"
     # This gets all the dependency information in plumed
     {
         firstline=""
@@ -71,18 +80,19 @@ if [[ $SETDEPENDENCIES ]]; then
             firstline=",\n"
         done
         echo -e '\n}'
-    } >"$GITHUB_WORKSPACE/_data/extradeps$VERSION.json"
+    } >"$depencies_file"
+    echo "depencies=$depencies_file" >>$GITHUB_OUTPUT
 fi
 hash=$(git rev-parse HEAD)
 
-if [[ -f $HOME/opt/lib/$PROGRAM_NAME/$hash ]]; then
+if [[ -f ${PREFIX}/lib/$program_name/$hash ]]; then
     echo "ALREADY AVAILABLE, NO NEED TO REINSTALL"
 else
     #remove the conflicting old installation
-    rm -fr "$PREFIX/lib/$PROGRAM_NAME"
-    rm -fr "$PREFIX/opt/bin/$PROGRAM_NAME"
-    rm -fr "$PREFIX/opt/include/$PROGRAM_NAME"
-    rm -fr "$PREFIX"/opt/lib/lib$PROGRAM_NAME.so*
+    rm -fr "$PREFIX/lib/$program_name"
+    rm -fr "$PREFIX/bin/$program_name"
+    rm -fr "$PREFIX/include/$program_name"
+    rm -fr "$PREFIX"/lib/lib$program_name.so*
 
     cat <<EOF
     ./configure --prefix="$HOME/opt" \
@@ -95,8 +105,8 @@ else
     make -j 5
     make install
 
-    touch "$HOME/opt/lib/$PROGRAM_NAME/$hash"
+    touch "${PREFIX}/lib/$program_name/$hash"
 EOF
 fi
 
-echo "plumed_path=${PREFIX}/bin" >>$GITHUB_OUTPUT
+echo "plumed_path=${PREFIX}" >>$GITHUB_OUTPUT

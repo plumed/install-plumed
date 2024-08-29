@@ -9,10 +9,6 @@ inputs:
     description: 'The version of plumed to install (default to master)'
     required: false
     default: ''
-  program_name:
-    description: 'The name of the program to install'
-    required: false
-    default: 'plumed'
   suffix:
     description: 'Suffix for the program name'
     required: false
@@ -20,7 +16,7 @@ inputs:
   prefix:
     description: 'The installation prefix'
     required: false
-    default: '~/opt/'
+    default: '~/opt'
   extra_options:
     description: 'Extra options for installing plumed'
     required: false
@@ -37,10 +33,17 @@ inputs:
     description: 'C++ compiler'
     required: false
     default: 'g++'
+  dependency_path:
+    description: 'Path where to store "extradeps$version.json"'
+    required: false
+    default: ''
 outputs:
-  path:
+  plumed_prefx:
     description: "Plumed executable path"
     value: ${{ steps.installation.outputs.plumed_path }}
+  depencies:
+    description: "Plumed dependency json file"
+    value: ${{ steps.installation.outputs.depencies }}
 runs:
   using: "composite"
   steps:
@@ -59,10 +62,10 @@ runs:
       env:
         REPO: ${{ inputs.repository }}
         VERSION: ${{ inputs.version }}
-        PROGRAM_NAME: ${{ inputs.program_name }}
         SUFFIX: ${{ inputs.suffix }}
         PREFIX: ${{ inputs.prefix }}
         EXTRA_OPTIONS: ${{ inputs.extra_options }}
         MODULES: ${{ inputs.modules }}
         CC: ${{ inputs.CC }}
         CXX: ${{ inputs.CXX }}
+        DEPPATH: ${{ inputs.dependency_path }}
