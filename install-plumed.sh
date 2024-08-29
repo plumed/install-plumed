@@ -1,30 +1,12 @@
-#!/bin/bash
 #! /bin/bash
 
-set -e
-set -x
-
 cat <<EOF
-SUFFIX="$SUFFIX"
-VERSION="$VERSION"
 REPO="$REPO"
+VERSION="$VERSION"
 PROGRAM_NAME="$PROGRAM_NAME"
+SUFFIX="$SUFFIX"
+PREFIX="$PREFIX"
 EOF
-
-# for opt; do
-#     case "$opt" in
-#     version=*) version="${opt#version=}" ;;
-#     suffix=*)
-#         suffix="--program-suffix=${opt#suffix=}"
-#         program_name="plumed${opt#suffix=}"
-#         ;;
-#     REPO=*) REPO="${opt#REPO=}" ;;
-#     *)
-#         echo "unknown option $opt"
-#         exit 1
-#         ;;
-#     esac
-# done
 
 cd "$(mktemp -dt plumed.XXXXXX)" || {
     echo "Failed to create tempdir"
@@ -41,6 +23,18 @@ else
         grep '^v2\.[0-9][0-9]*\.[0-9][0-9]*' |
         tail -n 1)
     echo "installing latest stable plumed $VERSION"
+fi
+
+plumed_options="$EXTRA_OPTIONS"
+if [[ -n "$SUFFIX" ]]; then
+    plumed_options="$plumed_options --program-suffix=\"$SUFFIX\""
+fi
+
+if [[ -n "$PREFIX" ]]; then
+    plumed_options="$plumed_options --prefix=\"$PREFIX\""
+fi
+if [[ -n "$MODULES" ]]; then
+    plumed_options="$plumed_options --enable-modules=$MODULES"
 fi
 
 #cheking out to $VERSION before compiling the dependency json for this $VERSION
@@ -84,22 +78,25 @@ hash=$(git rev-parse HEAD)
 if [[ -f $HOME/opt/lib/$PROGRAM_NAME/$hash ]]; then
     echo "ALREADY AVAILABLE, NO NEED TO REINSTALL"
 else
+    #remove the conflicting old installation
+    rm -fr "$PREFIX/lib/$PROGRAM_NAME"
+    rm -fr "$PREFIX/opt/bin/$PROGRAM_NAME"
+    rm -fr "$PREFIX/opt/include/$PROGRAM_NAME"
+    rm -fr "$PREFIX"/opt/lib/lib$PROGRAM_NAME.so*
 
-    rm -fr "$HOME/opt/lib/$PROGRAM_NAME"
-    rm -fr "$HOME/opt/bin/$PROGRAM_NAME"
-    rm -fr "$HOME/opt/include/$PROGRAM_NAME"
-    rm -fr "$HOME"/opt/lib/lib$PROGRAM_NAME.so*
     cat <<EOF
     ./configure --prefix="$HOME/opt" \
         --enable-modules=all \
         --enable-boost_serialization \
-        --enable-fftw $SUFFIX \
+        --enable-fftw --program-suffix=$SUFFIX \
         --enable-libtorch LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH
 
-
+./configure $plumed_options LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH
     make -j 5
     make install
 
     touch "$HOME/opt/lib/$PROGRAM_NAME/$hash"
 EOF
 fi
+
+echo "plumed_path=${PREFIX}/bin" >>$GITHUB_OUTPUT

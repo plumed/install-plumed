@@ -17,22 +17,43 @@ inputs:
     description: 'Suffix for the program name'
     required: false
     default: ''
-# outputs:
-#   random-number:
-#     description: "Random number"
-#     value: ${{ steps.random-number-generator.outputs.random-number }}
+  prefix:
+    description: 'The installation prefix'
+    required: false
+    default: '~/opt/'
+  extra_options:
+    description: 'Extra options for installing plumed'
+    required: false
+    default: '--enable-boost_serialization --enable-fftw --enable-libtorch'
+  modules:
+    description: 'List of modules to install, or "all"'
+    required: false
+    default: 'all'
+  CC:
+    description: 'C compiler'
+    required: false
+    default: 'gcc'
+  CXX:
+    description: 'C++ compiler'
+    required: false
+    default: 'g++'
+outputs:
+  path:
+    description: "Plumed executable path"
+    value: ${{ steps.installation.outputs.plumed_path }}
 runs:
   using: "composite"
   steps:
-    - name: Set up environment
-      shell: bash
-      run: |
-        sudo apt update
-        sudo apt install mpi-default-bin mpi-default-dev
-        sudo apt install libfftw3-dev gsl-bin libgsl0-dev libboost-serialization-dev
-        sudo apt install ccache
-        sudo apt-get update
+    # - name: Set up environment
+    #   shell: bash
+    #   run: |
+    #     sudo apt update
+    #     sudo apt install mpi-default-bin mpi-default-dev
+    #     sudo apt install libfftw3-dev gsl-bin libgsl0-dev libboost-serialization-dev
+    #     sudo apt install ccache
+    #     sudo apt-get update
     - name: Install plumed
+      id: installation
       run: $GITHUB_ACTION_PATH/install-plumed.sh
       shell: bash
       env:
@@ -40,3 +61,8 @@ runs:
         VERSION: ${{ inputs.version }}
         PROGRAM_NAME: ${{ inputs.program_name }}
         SUFFIX: ${{ inputs.suffix }}
+        PREFIX: ${{ inputs.prefix }}
+        EXTRA_OPTIONS: ${{ inputs.extra_options }}
+        MODULES: ${{ inputs.modules }}
+        CC: ${{ inputs.CC }}
+        CXX: ${{ inputs.CXX }}

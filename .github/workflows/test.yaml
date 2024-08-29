@@ -10,9 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: Iximiel/install-plumed@main
+    - name : install plumed
+      uses: Iximiel/install-plumed@main
+      id: plumed
     - name: run plumed
       run: |
+        echo ${{ steps.plumed.outputs.path }}
         plumed --version
         
   test_Stable:
