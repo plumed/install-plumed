@@ -1,14 +1,19 @@
 name: 'Install Plumed'
 description: 'Installs plumed from https://github.com/plumed/plumed2'
-# inputs:
-  # repository:
-  # suffix:
-  # version:
-  # program_name:
-  # who-to-greet:  # id of input
-  #   description: 'Who to greet'
-  #   required: true
-  #   default: 'World'
+inputs:
+  repository:
+    description: 'The url of the Plumed repository'
+    required: false
+    default: 'https://github.com/plumed/plumed2.git'
+  suffix:
+    description: 'Suffix for the program name'
+    required: false
+    default: ''
+  version:
+    description: 'The version of plumed to install (default to master)'
+    required: false
+    default: 'master'
+  program_name:
 # outputs:
 #   random-number:
 #     description: "Random number"
@@ -27,4 +32,8 @@ runs:
     - name: Install plumed
       run: $GITHUB_ACTION_PATH/install-plumed.sh
       shell: bash
-      
+      env:
+        SUFFIX: ${{ inputs.suffix }}
+        VERSION: ${{ inputs.version }}
+        PROGRAM_NAME: ${{ inputs.program_name }}
+        REPO: ${{ inputs.repository }}
