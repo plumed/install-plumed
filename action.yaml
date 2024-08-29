@@ -1,10 +1,10 @@
 name: 'Install Plumed'
 description: 'Installs plumed from https://github.com/plumed/plumed2'
 inputs:
-  repository:
-  suffix:
-  version:
-  program_name:
+  # repository:
+  # suffix:
+  # version:
+  # program_name:
   who-to-greet:  # id of input
     description: 'Who to greet'
     required: true
