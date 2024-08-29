@@ -1,0 +1,28 @@
+name: est
+
+on: [push, pull_request]
+
+jobs:
+  
+  test:
+    # strategy:
+    #   matrix:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: Iximiel/install-plumed@main
+    - name: run plumed
+      run: |
+        plumed --version
+        
+  test_Stable:
+    # strategy:
+    #   matrix:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: Iximiel/install-plumed@v1
+    - name: run plumed
+      run: |
+        plumed --version
+    
