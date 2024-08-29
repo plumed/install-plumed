@@ -1,22 +1,23 @@
 name: 'Install Plumed'
 description: 'Installs plumed from https://github.com/plumed/plumed2'
-inputs:
+# inputs:
   # repository:
   # suffix:
   # version:
   # program_name:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
-outputs:
-  random-number:
-    description: "Random number"
-    value: ${{ steps.random-number-generator.outputs.random-number }}
+  # who-to-greet:  # id of input
+  #   description: 'Who to greet'
+  #   required: true
+  #   default: 'World'
+# outputs:
+#   random-number:
+#     description: "Random number"
+#     value: ${{ steps.random-number-generator.outputs.random-number }}
 runs:
   using: "composite"
   steps:
     - name: Set up environment
+     shell: bash
      run: |
         sudo apt update
         sudo apt install mpi-default-bin mpi-default-dev
