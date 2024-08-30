@@ -41,7 +41,22 @@ jobs:
           head ${{ steps.plumed.outputs.dependency_file }}
           plumed --version
 
+  test_conf_fail:
+    # strategy:
+    #   matrix:
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: install plumed
+        continue-on-error: true
+        uses: Iximiel/install-plumed@main
+        with:
+          modules: "reset"
+          CXX: "not a valid compiler"
+        id: plumed
+      - name: check if a failure occured
+        if: steps.plumed.outcome == failure()
+        run: echo "Plumed installation failed as expected"
 #   test_stable:
 #     # strategy:
 #     #   matrix:
@@ -52,4 +67,3 @@ jobs:
 #     - name: run plumed
 #       run: |
 #         plumed --version
-    
