@@ -46,6 +46,7 @@ fi
 
 #just to be sure
 prefix=${PREFIX-~/opt}
+prefix=${prefix/~/$HOME}
 mkdir -p "$prefix"
 prefix=$(realpath "$prefix")
 if [[ -n "$PREFIX" ]]; then
