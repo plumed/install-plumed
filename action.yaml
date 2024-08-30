@@ -38,7 +38,7 @@ inputs:
     required: false
     default: ''
 outputs:
-  plumed_prefx:
+  plumed_prefix:
     description: "Plumed executable path"
     value: ${{ steps.installation.outputs.plumed_path }}
   dependency_file:
