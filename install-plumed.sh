@@ -45,7 +45,9 @@ if [[ -n "$SUFFIX" ]]; then
 fi
 
 #just to be sure
-prefix=$(realpath "${PREFIX-~/opt}")
+prefix=${PREFIX-~/opt}
+mkdir -p "$prefix"
+prefix=$(realpath "$prefix")
 if [[ -n "$PREFIX" ]]; then
     plumed_options="$plumed_options --prefix=\"$prefix\""
 fi
