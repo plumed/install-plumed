@@ -41,9 +41,9 @@ outputs:
   plumed_prefx:
     description: "Plumed executable path"
     value: ${{ steps.installation.outputs.plumed_path }}
-  depencies:
+  dependency_file:
     description: "Plumed dependency json file"
-    value: ${{ steps.installation.outputs.depencies }}
+    value: ${{ steps.installation.outputs.dependencies }}
 runs:
   using: "composite"
   steps:

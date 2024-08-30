@@ -14,11 +14,16 @@ cd "$(mktemp -dt plumed.XXXXXX)" || {
     exit 1
 }
 
-git clone "$REPO" >>/dev/null
-cd plumed2 || {
-    echo "Failed to cd into plumed2"
+if git clone --quiet "$REPO"; then
+    cd plumed2 || {
+        echo "Failed to cd into plumed2"
+        echo "Is the repository \"${REPO}\" a plumed repository?"
+        exit 1
+    }
+else
+    echo "Failed to clone plumed2"
     exit 1
-}
+fi
 
 version=$VERSION
 
@@ -46,10 +51,12 @@ if [[ -n "$MODULES" ]]; then
 fi
 
 #cheking out to $version before compiling the dependency json for this $version
-git checkout $version
+git checkout --quiet $version
 
 if [[ -n $DEPPATH ]]; then
-    depencies_file="${DEPPATH}/_data/extradeps$version.json"
+    mkdir -pv "$DEPPATH"
+    dependencies_file="${DEPPATH}/_data/extradeps${version}.json"
+    echo "Creating a dependencies file at $dependencies_file"
     # This gets all the dependency information in plumed
     {
         firstline=""
@@ -80,8 +87,8 @@ if [[ -n $DEPPATH ]]; then
             firstline=",\n"
         done
         echo -e '\n}'
-    } >"$depencies_file"
-    echo "depencies=$depencies_file" >>$GITHUB_OUTPUT
+    } >"$dependencies_file"
+    echo "dependencies=$dependencies_file" >>$GITHUB_OUTPUT
 fi
 hash=$(git rev-parse HEAD)
 
@@ -95,11 +102,7 @@ else
     rm -fr "$PREFIX"/lib/lib$program_name.so*
 
     cat <<EOF
-    ./configure --prefix="$HOME/opt" \
-        --enable-modules=all \
-        --enable-boost_serialization \
-        --enable-fftw --program-suffix=$SUFFIX \
-        --enable-libtorch LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH
+    ./configure --prefix="$HOME/opt" --enable-modules=all --enable-boost_serialization --enable-fftw --program-suffix=$SUFFIX --enable-libtorch LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH
 
 ./configure $plumed_options LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH
     make -j 5
