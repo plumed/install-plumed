@@ -37,9 +37,8 @@ jobs:
           sudo apt install libfftw3-dev gsl-bin libgsl0-dev libboost-serialization-dev
           sudo apt install ccache
           ccache -p
-          set -x
-          mkdir -pv ~/.ccache/ccache
-          ls ~/.ccache
+          ccache -s
+          mkdir -p ~/.ccache/ccache
       - name: install plumed
         uses: Iximiel/install-plumed@main
         with:
