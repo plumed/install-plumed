@@ -16,7 +16,7 @@ jobs:
         git clone --bare https://github.com/plumed/plumed2.git
         stable=$(cd plumed2.git ; git branch --list 'v2.*' --sort='version:refname'| sed "s/^ *//" | grep '^v2\.[0-9]*$' | tail -n 1)
         echo "key=$(cd plumed2.git ; git rev-parse "$stable")" >> $GITHUB_OUTPUT
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       with:
         path: ~/.ccache
         key: ccache-${{ runner.os }}-stable-${{ steps.get-key.outputs.key }}
@@ -31,13 +31,14 @@ jobs:
       uses: Iximiel/install-plumed@main
       with:
         modules: 'reset'
-        dependency_path: '$GITHUB_WORKSPACE/_data/'
+        dependency_path: '${{ github.workspace }}/_data'
         CC: 'ccache mpicc'
         CXX: 'ccache mpic++'
       id: plumed
     - name: run plumed
       run: |
         echo "plumed path:${{ steps.plumed.outputs.path }}"
+        ls ${{ steps.plumed.outputs.path }}/bin
         head ${{ steps.plumed.outputs.dependency_file }}
         plumed --version
         

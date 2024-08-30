@@ -103,8 +103,10 @@ else
 
     cat <<EOF
     ./configure --prefix="$HOME/opt" --enable-modules=all --enable-boost_serialization --enable-fftw --program-suffix=$SUFFIX --enable-libtorch LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH
-
-./configure $plumed_options LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH
+#${LD_LIBRARY_PATH+,${LD_LIBRARY_PATH}} wil print "," then the content of LD_LIBRARY_PATH, if it is not empty
+set -x
+./configure $plumed_options ${LD_LIBRARY_PATH+LDFLAGS=-Wl,-rpath,\"${LD_LIBRARY_PATH}\"}
+set +x
     make -j 5
     make install
 
