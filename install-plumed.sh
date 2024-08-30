@@ -36,6 +36,7 @@ else
     echo "installing latest stable plumed $version"
 fi
 
+#TODO: make plumed_options an array
 plumed_options="$EXTRA_OPTIONS"
 program_name=plumed
 if [[ -n "$SUFFIX" ]]; then
@@ -103,19 +104,17 @@ else
     rm -fr "${prefix:?}/bin/$program_name"
     rm -fr "${prefix:?}/include/$program_name"
     rm -fr "${prefix:?}"/lib/lib$program_name.so*
-    #{var:?} makes the shell fail to avoid "explosive" deletions in lib and bin
+    #{var:?} makes the shell fail to avoid unwanted "explosive" deletions in /lib and /bin
 
-    cat <<EOF
-    ./configure --prefix="$HOME/opt" --enable-modules=all --enable-boost_serialization --enable-fftw --program-suffix=$SUFFIX --enable-libtorch LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH
-#${LD_LIBRARY_PATH+,${LD_LIBRARY_PATH}} wil print "," then the content of LD_LIBRARY_PATH, if it is not empty
-set -x
-./configure $plumed_options ${LD_LIBRARY_PATH+LDFLAGS=-Wl,-rpath,\"${LD_LIBRARY_PATH}\"}
-set +x
+    #${LD_LIBRARY_PATH+,${LD_LIBRARY_PATH}} wil print "," then the content of LD_LIBRARY_PATH, if it is not empty
+    set -x
+    ./configure $plumed_options ${LD_LIBRARY_PATH+LDFLAGS=-Wl,-rpath,\"${LD_LIBRARY_PATH}\"}
+    set +x
     make -j 5
     make install
 
     touch "${prefix}/lib/$program_name/$hash"
-EOF
+
 fi
 
 echo "plumed_path=${prefix}" >>$GITHUB_OUTPUT
