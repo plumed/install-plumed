@@ -67,6 +67,11 @@ jobs:
       - name: check if a failure occured
         if: steps.plumed.outcome == failure()
         run: echo "Plumed installation failed as expected"
+      - name: check if a failure has not occured
+        if: steps.plumed.outcome == success()
+        run: |
+         echo "Plumed installation did not failed as expected"
+         exit 1
 #   test_stable:
 #     # strategy:
 #     #   matrix:
