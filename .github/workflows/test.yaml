@@ -39,7 +39,7 @@ jobs:
           ccache -p
           ccache -s
           mkdir -p ~/.ccache/ccache
-      - name: install plumed
+      - name: Install plumed
         uses: Iximiel/install-plumed@main
         with:
           modules: "reset"
@@ -71,13 +71,53 @@ jobs:
         run: |
           if [[ ${{ steps.plumed.outcome }} == 'failure' ]]; then echo "Plumed installation failed as expected"; exit 0; else echo "Plumed installation did not failed as expected"; exit 1; fi
 
-#   test_stable:
-#     # strategy:
-#     #   matrix:
-#     runs-on: ubuntu-latest
+  test_stable:
+    # strategy:
+    #   matrix:
+    runs-on: ubuntu-latest
 
-#     steps:
-#     - uses: Iximiel/install-plumed@v1
-#     - name: run plumed
-#       run: |
-#         plumed --version
+    steps:
+    - name: calculate cache key for the compilation
+      id: get-key
+      run: |
+        git clone --bare https://github.com/plumed/plumed2.git
+        stable=$(cd plumed2.git ; git branch --list 'v2.*' --sort='version:refname'| sed "s/^ *//" | grep '^v2\.[0-9]*$' | tail -n 1)
+        echo "key=$(cd plumed2.git ; git rev-parse "$stable")" >> $GITHUB_OUTPUT
+    - uses: actions/cache@v4
+      with:
+        path: ~/.ccache
+        key: ccache-${{ runner.os }}-stable-${{ steps.get-key.outputs.key }}
+        restore-keys: ccache-${{ runner.os }}-stable
+    - name: Set paths
+      run: |
+          echo "$HOME/opt/bin" >> $GITHUB_PATH
+          echo "CPATH=$HOME/opt/include:$HOME/opt/libtorch/include/torch/csrc/api/include/:$HOME/opt/libtorch/include/:$HOME/opt/libtorch/include/torch:$CPATH" >> $GITHUB_ENV
+          echo "INCLUDE=$HOME/opt/include:$HOME/opt/libtorch/include/torch/csrc/api/include/:$HOME/opt/libtorch/include/:$HOME/opt/libtorch/include/torch:$INCLUDE" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=$HOME/opt/lib:$HOME/opt/libtorch/lib:$LIBRARY_PATH" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$HOME/opt/lib:$HOME/opt/libtorch/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+          echo "PYTHONPATH=$HOME/opt/lib/plumed/python:$PYTHONPATH" >> $GITHUB_ENV
+          # needed to avoid MPI warning
+          echo "OMPI_MCA_btl=^openib" >> $GITHUB_ENV
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install mpi-default-bin mpi-default-dev
+        sudo apt install libfftw3-dev gsl-bin libgsl0-dev libboost-serialization-dev
+        sudo apt install ccache
+        ccache -p
+        ccache -s
+        mkdir -p ~/.ccache/ccache
+    - name: Install plumed
+      uses: Iximiel/install-plumed@v1
+      with:
+        modules: "reset"
+        dependency_path: "${{ github.workspace }}/_data"
+        CC: "ccache mpicc"
+        CXX: "ccache mpic++"
+      id: plumed
+    - name: run plumed
+      run: |
+        echo "plumed path:${{ steps.plumed.outputs.plumed_prefx }}"
+        ls ${{ steps.plumed.outputs.plumed_prefx }}/bin
+        head ${{ steps.plumed.outputs.dependency_file }}
+        plumed info --version
