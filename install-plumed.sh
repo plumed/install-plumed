@@ -53,8 +53,9 @@ fi
 git checkout --quiet "$version"
 
 if [[ -n $DEPPATH ]]; then
-    mkdir -pv "$DEPPATH"
-    dependencies_file="${DEPPATH}/extradeps${version}.json"
+    mypath=$(realpath $DEPPATH)
+    mkdir -pv "$mypath"
+    dependencies_file="${mypath}/extradeps${version}.json"
     echo "Creating a dependencies file at $dependencies_file"
     # This gets all the dependency information in plumed
     {
