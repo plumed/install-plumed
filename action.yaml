@@ -20,7 +20,7 @@ inputs:
   extra_options:
     description: 'Extra options for installing plumed'
     required: false
-    default: '--enable-boost_serialization --enable-fftw --enable-libtorch'
+    default: '--enable-boost_serialization --enable-fftw --enable-libtorch --disable-basic-warnings'
   modules:
     description: 'List of modules to install, or "all"'
     required: false
