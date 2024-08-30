@@ -49,7 +49,7 @@ jobs:
           echo "plumed path:${{ steps.plumed.outputs.plumed_prefx }}"
           ls ${{ steps.plumed.outputs.plumed_prefx }}/bin
           head ${{ steps.plumed.outputs.dependency_file }}
-          plumed --version
+          plumed info --version
 
   test_conf_fail:
     # strategy:
@@ -65,13 +65,9 @@ jobs:
           CXX: "not a valid compiler"
         id: plumed
       - name: check if a failure occured
-        if: steps.plumed.outcome == failure()
-        run: echo "Plumed installation failed as expected"
-      - name: check if a failure has not occured
-        if: steps.plumed.outcome == success()
         run: |
-         echo "Plumed installation did not failed as expected"
-         exit 1
+          if [[ ${{ steps.plumed.outcome }} == 'failure' ]]; then echo "Plumed installation failed as expected"; exit 0; else echo "Plumed installation did not failed as expected"; exit 1; fi
+
 #   test_stable:
 #     # strategy:
 #     #   matrix:
