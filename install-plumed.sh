@@ -46,8 +46,8 @@ if [[ -n "$SUFFIX" ]]; then
 fi
 
 #just to be sure
-prefix=${PREFIX-~/opt}
-prefix=${prefix/~/$HOME}
+prefix=${PREFIX:-"$HOME/opt"}
+prefix=${prefix/'~'/$HOME}
 mkdir -p "$prefix"
 prefix=$(realpath "$prefix")
 plumed_options="$plumed_options --prefix=\"$prefix\""

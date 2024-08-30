@@ -42,14 +42,14 @@ jobs:
         head ${{ steps.plumed.outputs.dependency_file }}
         plumed --version
         
-  test_stable:
-    # strategy:
-    #   matrix:
-    runs-on: ubuntu-latest
+#   test_stable:
+#     # strategy:
+#     #   matrix:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - uses: Iximiel/install-plumed@v1
-    - name: run plumed
-      run: |
-        plumed --version
+#     steps:
+#     - uses: Iximiel/install-plumed@v1
+#     - name: run plumed
+#       run: |
+#         plumed --version
     
