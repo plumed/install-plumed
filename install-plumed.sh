@@ -2,6 +2,7 @@
 
 # To me: the enviromental variable I am using as input are in CAPS,
 # if I modify a variable is in lower case
+set -x
 
 cat <<EOF
 REPO="$REPO"
@@ -49,9 +50,7 @@ prefix=${PREFIX-~/opt}
 prefix=${prefix/~/$HOME}
 mkdir -p "$prefix"
 prefix=$(realpath "$prefix")
-if [[ -n "$PREFIX" ]]; then
-    plumed_options="$plumed_options --prefix=\"$prefix\""
-fi
+plumed_options="$plumed_options --prefix=\"$prefix\""
 
 if [[ -n "$MODULES" ]]; then
     plumed_options="$plumed_options --enable-modules=$MODULES"
@@ -59,6 +58,11 @@ fi
 
 #cheking out to $version before compiling the dependency json for this $version
 git checkout --quiet $version
+
+cat <<EOF
+prefix=$prefix
+plumed_options=$plumed_options
+EOF
 
 if [[ -n $DEPPATH ]]; then
     mkdir -pv "$DEPPATH"
