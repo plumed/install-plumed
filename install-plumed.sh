@@ -30,7 +30,7 @@ else
     echo "installing latest stable plumed $version"
 fi
 
-#TODO: make plumed_options an array
+#TODO: make plumed_options an array to solve spaces problems and solve SC2086
 plumed_options="$EXTRA_OPTIONS"
 program_name=plumed
 if [[ -n "$SUFFIX" ]]; then
@@ -50,7 +50,7 @@ if [[ -n "$MODULES" ]]; then
 fi
 
 #cheking out to $version before compiling the dependency json for this $version
-git checkout --quiet $version
+git checkout --quiet "$version"
 
 if [[ -n $DEPPATH ]]; then
     mkdir -pv "$DEPPATH"
@@ -87,7 +87,7 @@ if [[ -n $DEPPATH ]]; then
         done
         echo -e '\n}'
     } >"$dependencies_file"
-    echo "dependencies=$dependencies_file" >>$GITHUB_OUTPUT
+    echo "dependencies=$dependencies_file" >>"$GITHUB_OUTPUT"
 fi
 hash=$(git rev-parse HEAD)
 
@@ -115,4 +115,4 @@ else
 
 fi
 
-echo "plumed_path=${prefix}" >>$GITHUB_OUTPUT
+echo "plumed_path=${prefix}" >>"$GITHUB_OUTPUT"
