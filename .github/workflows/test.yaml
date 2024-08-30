@@ -38,21 +38,22 @@ jobs:
           sudo apt install ccache
           ccache -p
           set -x
+          mkdir -pv ~/.ccache/ccache
           ls ~/.ccache
-    #   - name: install plumed
-    #     uses: Iximiel/install-plumed@main
-    #     with:
-    #       modules: "reset"
-    #       dependency_path: "${{ github.workspace }}/_data"
-    #       CC: "ccache mpicc"
-    #       CXX: "ccache mpic++"
-    #     id: plumed
-    #   - name: run plumed
-    #     run: |
-    #       echo "plumed path:${{ steps.plumed.outputs.plumed_prefx }}"
-    #       ls ${{ steps.plumed.outputs.plumed_prefx }}/bin
-    #       head ${{ steps.plumed.outputs.dependency_file }}
-    #       plumed info --version
+      - name: install plumed
+        uses: Iximiel/install-plumed@main
+        with:
+          modules: "reset"
+          dependency_path: "${{ github.workspace }}/_data"
+          CC: "ccache mpicc"
+          CXX: "ccache mpic++"
+        id: plumed
+      - name: run plumed
+        run: |
+          echo "plumed path:${{ steps.plumed.outputs.plumed_prefx }}"
+          ls ${{ steps.plumed.outputs.plumed_prefx }}/bin
+          head ${{ steps.plumed.outputs.dependency_file }}
+          plumed info --version
 
   test_conf_fail:
     # strategy:
