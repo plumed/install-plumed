@@ -43,9 +43,12 @@ if [[ -n "$SUFFIX" ]]; then
     program_name=$program_name$SUFFIX
 fi
 
+#just to be sure
+prefix=${PREFIX-~/opt}
 if [[ -n "$PREFIX" ]]; then
-    plumed_options="$plumed_options --prefix=\"$PREFIX\""
+    plumed_options="$plumed_options --prefix=\"$prefix\""
 fi
+
 if [[ -n "$MODULES" ]]; then
     plumed_options="$plumed_options --enable-modules=$MODULES"
 fi
@@ -55,7 +58,7 @@ git checkout --quiet $version
 
 if [[ -n $DEPPATH ]]; then
     mkdir -pv "$DEPPATH"
-    dependencies_file="${DEPPATH}/_data/extradeps${version}.json"
+    dependencies_file="${DEPPATH}/extradeps${version}.json"
     echo "Creating a dependencies file at $dependencies_file"
     # This gets all the dependency information in plumed
     {
@@ -92,14 +95,15 @@ if [[ -n $DEPPATH ]]; then
 fi
 hash=$(git rev-parse HEAD)
 
-if [[ -f ${PREFIX}/lib/$program_name/$hash ]]; then
+if [[ -f ${prefix}/lib/$program_name/$hash ]]; then
     echo "ALREADY AVAILABLE, NO NEED TO REINSTALL"
 else
     #remove the conflicting old installation
-    rm -fr "$PREFIX/lib/$program_name"
-    rm -fr "$PREFIX/bin/$program_name"
-    rm -fr "$PREFIX/include/$program_name"
-    rm -fr "$PREFIX"/lib/lib$program_name.so*
+    rm -fr "${prefix:?}/lib/$program_name"
+    rm -fr "${prefix:?}/bin/$program_name"
+    rm -fr "${prefix:?}/include/$program_name"
+    rm -fr "${prefix:?}"/lib/lib$program_name.so*
+    #{var:?} makes the shell fail to avoid "explosive" deletions in lib and bin
 
     cat <<EOF
     ./configure --prefix="$HOME/opt" --enable-modules=all --enable-boost_serialization --enable-fftw --program-suffix=$SUFFIX --enable-libtorch LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH
@@ -110,8 +114,8 @@ set +x
     make -j 5
     make install
 
-    touch "${PREFIX}/lib/$program_name/$hash"
+    touch "${prefix}/lib/$program_name/$hash"
 EOF
 fi
 
-echo "plumed_path=${PREFIX}" >>$GITHUB_OUTPUT
+echo "plumed_path=${prefix}" >>$GITHUB_OUTPUT

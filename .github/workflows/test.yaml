@@ -37,8 +37,8 @@ jobs:
       id: plumed
     - name: run plumed
       run: |
-        echo "plumed path:${{ steps.plumed.outputs.path }}"
-        ls ${{ steps.plumed.outputs.path }}/bin
+        echo "plumed path:${{ steps.plumed.outputs.plumed_prefx }}"
+        ls ${{ steps.plumed.outputs.plumed_prefx }}/bin
         head ${{ steps.plumed.outputs.dependency_file }}
         plumed --version
         
