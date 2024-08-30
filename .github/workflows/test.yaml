@@ -3,45 +3,45 @@ name: Test
 on: [push]
 
 jobs:
-  
   test_main:
     # strategy:
     #   matrix:
     runs-on: ubuntu-latest
 
     steps:
-    - name: calculate cache key for the compilation
-      id: get-key
-      run: |
-        git clone --bare https://github.com/plumed/plumed2.git
-        stable=$(cd plumed2.git ; git branch --list 'v2.*' --sort='version:refname'| sed "s/^ *//" | grep '^v2\.[0-9]*$' | tail -n 1)
-        echo "key=$(cd plumed2.git ; git rev-parse "$stable")" >> $GITHUB_OUTPUT
-    - uses: actions/cache@v4
-      with:
-        path: ~/.ccache
-        key: ccache-${{ runner.os }}-stable-${{ steps.get-key.outputs.key }}
-        restore-keys: ccache-${{ runner.os }}-stable
-    - name: Install dependencies
-      run: |
+      - name: calculate cache key for the compilation
+        id: get-key
+        run: |
+          git clone --bare https://github.com/plumed/plumed2.git
+          stable=$(cd plumed2.git ; git branch --list 'v2.*' --sort='version:refname'| sed "s/^ *//" | grep '^v2\.[0-9]*$' | tail -n 1)
+          echo "key=$(cd plumed2.git ; git rev-parse "$stable")" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ccache-${{ runner.os }}-stable-${{ steps.get-key.outputs.key }}
+          restore-keys: ccache-${{ runner.os }}-stable
+      - name: Install dependencies
+        run: |
           sudo apt update
           sudo apt install mpi-default-bin mpi-default-dev
           sudo apt install libfftw3-dev gsl-bin libgsl0-dev libboost-serialization-dev
           sudo apt install ccache
-    - name : install plumed
-      uses: Iximiel/install-plumed@main
-      with:
-        modules: 'reset'
-        dependency_path: '${{ github.workspace }}/_data'
-        CC: 'ccache mpicc'
-        CXX: 'ccache mpic++'
-      id: plumed
-    - name: run plumed
-      run: |
-        echo "plumed path:${{ steps.plumed.outputs.plumed_prefx }}"
-        ls ${{ steps.plumed.outputs.plumed_prefx }}/bin
-        head ${{ steps.plumed.outputs.dependency_file }}
-        plumed --version
-        
+      - name: install plumed
+        uses: Iximiel/install-plumed@main
+        with:
+          modules: "reset"
+          dependency_path: "${{ github.workspace }}/_data"
+          CC: "ccache mpicc"
+          CXX: "ccache mpic++"
+        id: plumed
+      - name: run plumed
+        run: |
+          echo "plumed path:${{ steps.plumed.outputs.plumed_prefx }}"
+          ls ${{ steps.plumed.outputs.plumed_prefx }}/bin
+          head ${{ steps.plumed.outputs.dependency_file }}
+          plumed --version
+
+
 #   test_stable:
 #     # strategy:
 #     #   matrix:
