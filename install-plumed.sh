@@ -2,14 +2,7 @@
 
 # To me: the enviromental variable I am using as input are in CAPS,
 # if I modify a variable is in lower case
-set -x
 
-cat <<EOF
-REPO="$REPO"
-VERSION="$VERSION"
-SUFFIX="$SUFFIX"
-PREFIX="$PREFIX"
-EOF
 cd "$(mktemp -dt plumed.XXXXXX)" || {
     echo "Failed to create tempdir"
     exit 1
@@ -58,11 +51,6 @@ fi
 
 #cheking out to $version before compiling the dependency json for this $version
 git checkout --quiet $version
-
-cat <<EOF
-prefix=$prefix
-plumed_options=$plumed_options
-EOF
 
 if [[ -n $DEPPATH ]]; then
     mkdir -pv "$DEPPATH"
@@ -114,9 +102,12 @@ else
     #{var:?} makes the shell fail to avoid unwanted "explosive" deletions in /lib and /bin
 
     #${LD_LIBRARY_PATH+,${LD_LIBRARY_PATH}} wil print "," then the content of LD_LIBRARY_PATH, if it is not empty
-    set -x
-    ./configure $plumed_options ${LD_LIBRARY_PATH+LDFLAGS=-Wl,-rpath,\"${LD_LIBRARY_PATH}\"}
-    set +x
+    set -e
+    (
+        set -x
+        ./configure $plumed_options ${LD_LIBRARY_PATH+LDFLAGS=-Wl,-rpath,\"${LD_LIBRARY_PATH}\"}
+    )
+
     make -j 5
     make install
 
