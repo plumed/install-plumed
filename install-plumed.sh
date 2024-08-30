@@ -34,7 +34,7 @@ fi
 plumed_options="$EXTRA_OPTIONS"
 program_name=plumed
 if [[ -n "$SUFFIX" ]]; then
-    plumed_options="$plumed_options --program-suffix=\"$SUFFIX\""
+    plumed_options="$plumed_options --program-suffix=$SUFFIX"
     program_name=$program_name$SUFFIX
 fi
 
@@ -43,7 +43,7 @@ prefix=${PREFIX:-"$HOME/opt"}
 prefix=${prefix/'~'/$HOME}
 mkdir -p "$prefix"
 prefix=$(realpath "$prefix")
-plumed_options="$plumed_options --prefix=\"$prefix\""
+plumed_options="$plumed_options --prefix=$prefix"
 
 if [[ -n "$MODULES" ]]; then
     plumed_options="$plumed_options --enable-modules=$MODULES"
