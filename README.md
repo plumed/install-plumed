@@ -13,7 +13,7 @@ An action to install plumed in your workflow.
 
 *Iximiel/install-plumed* installs plumed in your workflow in a standardize fashion.
 
-This action synergise with using [ccache](https://ccache.dev/) and [actions/gh-actions-cache](https://github.com/actions/gh-actions-cache).
+This action synergise with using [ccache](https://ccache.dev/) and [actions/cache](https://github.com/actions/cache).
 
 An example of calling this action in your workflow is:
 
@@ -189,10 +189,10 @@ In this case the module will be in your GH workspace
 ## Caching stratiegies
 There are two caching strategies avaiable with this action
 
-- **[ccache](https://ccache.dev/) and [actions/gh-actions-cache](https://github.com/actions/gh-actions-cache)** by storing the `~/.ccache` directory
-- **[actions/gh-actions-cache](https://github.com/actions/gh-actions-cache)** by storing the installation directory
+- **[ccache](https://ccache.dev/) and [actions/cache](https://github.com/actions/cache)** by storing the `~/.ccache` directory
+- **[actions/cache](https://github.com/actions/cache)** by storing the installation directory
 
-### ccache and actions/gh-actions-cache
+### ccache and actions/cache
 
 Using ccache will store the compilation artifacs and speed up new runs
 
@@ -214,7 +214,9 @@ jobs:
           echo "key=$(cd plumed2.git ; git rev-parse "$stable")" >> $GITHUB_OUTPUT
       - uses: actions/cache@v4
         with:
-          path: ~/.ccache
+          path: |
+            ~/.ccache
+            ~/opt
           key: ccache-${{ runner.os }}-stable-${{ steps.get-key.outputs.key }}
           restore-keys: ccache-${{ runner.os }}-stable
       - name: Set paths
@@ -251,7 +253,7 @@ jobs:
           head ${{ steps.plumed.outputs.dependency_file }}
           plumed info --version
 ```
-In this case, after installing ccache we aslo force the creation of the ccache cache with `mkdir -p ~/.ccache/ccache`.
+In this case, after installing ccache we also force the creation of the ccache cache with `mkdir -p ~/.ccache/ccache`.
 This combined with
 ```yaml
 - uses: actions/cache@v4
@@ -262,7 +264,7 @@ This combined with
 ```
 will ensure the storage of the compiler cache for subsequent runs.
 
-### only actions/gh-actions-cache
+### only actions/cache
 
 ```yaml
 name: Test
