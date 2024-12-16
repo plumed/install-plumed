@@ -11,9 +11,9 @@ An action to install plumed in your workflow.
 ![Test](https://github.com/Iximiel/install-plumed/actions/workflows/test.yaml/badge.svg?branch=main&event=push)
 </div>
 
-*Iximiel/install-plumed* installs plumed in your workflow in a standardize fashion.
+*Iximiel/install-plumed* installs plumed in your workflow in a standardized fashion.
 
-This action synergise with using [ccache](https://ccache.dev/) and [actions/cache](https://github.com/actions/cache).
+This action synergize with using [ccache](https://ccache.dev/) and [actions/cache](https://github.com/actions/cache).
 
 An example of calling this action in your workflow is:
 
@@ -41,10 +41,10 @@ This action outputs two parameters:
  - **plumed_prefix** the path where plumed has installed into
  - **dependency_file** the full path of the dependency file created if `dependency_path` is specified (see [below](#dependency_path)).
  
- In the previous example you can access to them within the job with: `${{ steps.plumed.outputs.plumed_prefix }}` and  `${{ steps.plumed.outputs.dependency_file }}`
+ In the previous example you can access to them within the job with: `${{ steps.plumed.outputs.plumed_prefix }}` and `${{ steps.plumed.outputs.dependency_file }}`
 ## Options
 
-You are not required to use any option, with everithing set to default plumed will be configured with:
+You are not required to use any option, with everything set to default plumed will be configured with:
 
 ```bash
 CC="gcc" CXX="g++" ./configure --enable-boost_serialization --enable-fftw --enable-libtorch --disable-basic-warnings --prefix=~/opt --enable-modules=all LDFLAGS=-Wl,-rpath,${LD_LIBRARY_PATH}
@@ -52,7 +52,7 @@ CC="gcc" CXX="g++" ./configure --enable-boost_serialization --enable-fftw --enab
 
 Plumed will be cloned from `https://github.com/plumed/plumed2.git` and the script will automatically install the latest stable version.
 
-And by default the intenral module dependencies will not be compiled.
+And by default the internal module dependencies will not be compiled.
 
 - Options
   - [repository](#repository)
@@ -108,13 +108,13 @@ This options will change the `--suffix=""` option in the configuration phase. Us
 #### prefix
   *default*: `'~/opt'`
 
-This option will set up the installation prefixThe installation prefix
+This option will set up the installation prefix.
     
 #### extra_options
 *default*: `'--enable-boost_serialization --enable-fftw --enable-libtorch --disable-basic-warnings'`
 
 Extra options for installing plumed.
-The options will override the default ones, so if you want to add a extra option you will need to specify the whole string 
+The options will override the default ones, so if you want to add an extra option you will need to specify the whole string 
 ```yaml
 - name: Install plumed master
   uses: Iximiel/install-plumed@v1
@@ -128,8 +128,8 @@ Fora a complete installation with no parallelism.
 #### modules
 *default*: `'all'`
 
-A `:` separated list of modules to install, or , will change the `--enable-modules=""` in the configure phase.
-Or alternatively you can use the special keyworks `all`, `none` and `reset`.
+A `:` separated list of modules to install, or, will change the `--enable-modules=""` in the configure phase.
+Or alternatively you can use the special keywords `all`, `none` and `reset`.
     
 ```yaml
 - name: Install plumed master
@@ -138,7 +138,7 @@ Or alternatively you can use the special keyworks `all`, `none` and `reset`.
     version: 'master'
     modules: 'reset'
 ```
-Since the action is set up to default install everithing, using `reset` will make possible  installing only the default modules
+Since the action is set up to default install everything, using `reset` will make possible installing only the default modules
 
 #### CC
 *default*: `'gcc'`
@@ -166,12 +166,12 @@ CC=compiler_chosen CXX=compiler_chosen++ ./configure **options**
     CC: 'ccache mpicc'
     CXX: 'ccache mpic++'
 ```
-Here plumed will be be installed using mpi and by prepending ccache you will use ccache to store some compilation artifact and speed up [new workflows](#caching-stratiegies)
+Here plumed will be installed using mpi and by prepending ccache you will use ccache to store some compilation artifact and speed up [new workflows](#caching-stratiegies)
 
 #### dependency_path
 *default*: `''`
 
-If specified a file `extradeps$version.json` will be create in the specified path with the internal module dependencies.
+If specified a file `extradeps$version.json` will be created in the specified path with the internal module dependencies.
 
 If the variable is present, the step will also produce an output with the full path of that file.
 
@@ -186,15 +186,15 @@ If the variable is present, the step will also produce an output with the full p
 ```
 In this case the module will be in your GH workspace
 
-## Caching stratiegies
-There are two caching strategies avaiable with this action
+## Caching strategies
+There are two caching strategies available with this action
 
 - **[ccache](https://ccache.dev/) and [actions/cache](https://github.com/actions/cache)** by storing the `~/.ccache` directory
 - **[actions/cache](https://github.com/actions/cache)** by storing the installation directory
 
 ### ccache and actions/cache
 
-Using ccache will store the compilation artifacs and speed up new runs
+Using ccache will store the compilation artifacts and speed up new runs
 
 ```yaml
 name: Test
@@ -318,7 +318,7 @@ jobs:
           plumed info --version
 ```
 
-*Iximiel/install-plumed* after compiling plumed will store an extra file that will contain the hash of the commit used to compile plumed in the installation directory (`${prefix}/plumed${suffix}/${hash}`), if *Iximiel/install-plumed* finds that file during the set up, it will assume that that version of plumed is already present and will completely skip the compilation.
+*Iximiel/install-plumed* after compiling plumed will store an extra file that contains the hash of the commit used to compile plumed in the installation directory (`${prefix}/plumed${suffix}/${hash}`), if *Iximiel/install-plumed* finds that file during the setup, it will assume that that version of plumed is already present and will completely skip the compilation.
 
 The default installation path is `~/opt`, so
 
@@ -331,7 +331,7 @@ The default installation path is `~/opt`, so
 ```
 will do the trick for you.
 
-You can also combine the two approaches, expecially if you use the [`version`](#version) keyword to checkout to a branch instead of a tag.
+You can also combine the two approaches, especially if you use the [`version`](#version) keyword to check out to a branch instead of a tag.
 ```yaml
 - uses: actions/cache@v4
   with:
