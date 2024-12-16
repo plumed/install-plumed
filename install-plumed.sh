@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # To me: the enviromental variable I am using as input are in CAPS,
-# if I modify a variable is in lower case
+# if I want to modify a variable I copy it in a lower case one
 
 cd "$(mktemp -dt plumed.XXXXXX)" || {
     echo "Failed to create tempdir"
@@ -19,6 +19,7 @@ else
     exit 1
 fi
 
+#shellcheck disable=SC2153
 version=$VERSION
 
 if [[ -n "$version" ]]; then
@@ -53,7 +54,7 @@ fi
 git checkout --quiet "$version"
 
 if [[ -n $DEPPATH ]]; then
-    mypath=$(realpath $DEPPATH)
+    mypath=$(realpath "$DEPPATH")
     mkdir -pv "$mypath"
     dependencies_file="${mypath}/extradeps${version}.json"
     echo "Creating a dependencies file at $dependencies_file"
@@ -99,13 +100,14 @@ else
     rm -fr "${prefix:?}/lib/$program_name"
     rm -fr "${prefix:?}/bin/$program_name"
     rm -fr "${prefix:?}/include/$program_name"
-    rm -fr "${prefix:?}"/lib/lib$program_name.so*
+    rm -fr "${prefix:?}"/lib/lib"$program_name".so*
     #{var:?} makes the shell fail to avoid unwanted "explosive" deletions in /lib and /bin
 
     #${LD_LIBRARY_PATH+,${LD_LIBRARY_PATH}} wil print "," then the content of LD_LIBRARY_PATH, if it is not empty
     set -e
     (
         set -x
+        #shellcheck disable=SC2086
         ./configure $plumed_options ${LD_LIBRARY_PATH+LDFLAGS=-Wl,-rpath,\"${LD_LIBRARY_PATH}\"}
     )
 
